@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Authentication Demo</title>
+    <style>
+      body { font: 16px system-ui, sans-serif; max-width: 680px; margin: 48px auto; padding: 0 20px; color: #172033; }
+      form { display: grid; gap: 10px; padding: 20px; border: 1px solid #d9deea; border-radius: 12px; margin: 18px 0; }
+      input, button { padding: 10px; border-radius: 7px; border: 1px solid #bfc8d8; font: inherit; }
+      button { background: #2155d6; color: white; border: 0; cursor: pointer; }
+      code, pre { background: #f3f6fa; padding: 12px; border-radius: 8px; overflow-wrap: anywhere; white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <h1>JWT authentication demo</h1>
+    <p>Register or sign in. The access token stays in this page's memory; the refresh token is an HttpOnly cookie.</p>
+    <form id="auth-form">
+      <input id="email" type="email" placeholder="you@example.com" required>
+      <input id="password" type="password" minlength="8" placeholder="Password (8+ characters)" required>
+      <button name="action" value="register">Register</button>
+      <button name="action" value="login">Log in</button>
+    </form>
+    <p><button id="me">Call protected /api/me</button> <button id="logout">Log out</button></p>
+    <pre id="output">Waiting for action…</pre>
+    <script>
+      let accessToken = null;
+      const out = document.querySelector('#output');
+      const show = (body) => out.textContent = JSON.stringify(body, null, 2);
+      document.querySelector('#auth-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const action = event.submitter.value;
+        const res = await fetch(`/auth/${action}`, {
+          method: 'POST', headers: { 'content-type': 'application/json' }, credentials: 'same-origin',
+          body: JSON.stringify({ email: email.value, password: password.value })
+        });
+        const body = await res.json();
+        if (res.ok) accessToken = body.accessToken;
+        show(body);
+      });
+      document.querySelector('#me').onclick = async () => {
+        const res = await fetch('/api/me', { headers: accessToken ? { authorization: `Bearer ${accessToken}` } : {} });
+        show(await res.json());
+      };
+      document.querySelector('#logout').onclick = async () => {
+        await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
+        accessToken = null; show({ message: 'Logged out' });
+      };
+    </script>
+  </body>
+</html>
