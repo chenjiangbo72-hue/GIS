@@ -1,0 +1,22 @@
+{
+  "name": "express-jwt-auth-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Runnable Express authentication demo with access and refresh tokens",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
